@@ -1,0 +1,122 @@
+- id: '1537306406918'
+  alias: Autolight Night Mode
+  trigger:
+  - at: '23:10'
+    platform: time
+  condition:
+  - condition: time
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+  action:
+  - data:
+      entity_id: light.k01
+    service: light.turn_off
+  - data:
+      entity_id: light.k02
+    service: light.turn_off
+  - data:
+      entity_id: light.h01
+    service: light.turn_off
+- id: '1537306406919'
+  alias: Autolight Morning Mode
+  trigger:
+  - at: 06:15
+    platform: time
+  condition:
+  - condition: time
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+    - sat
+    - sun
+  action:
+  - data:
+      brightness: '40'
+      entity_id: light.k01
+    service: light.turn_on
+  - data:
+      brightness: '40'
+      entity_id: light.k02
+    service: light.turn_on
+  - data:
+      brightness: '40'
+      entity_id: light.h01
+    service: light.turn_on
+- id: '1537306406920'
+  alias: Autolight Day Mode
+  trigger:
+  - at: '10:15'
+    platform: time
+  condition:
+  - condition: time
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+  action:
+  - data:
+      entity_id: light.k01
+    service: light.turn_off
+  - data:
+      entity_id: light.k02
+    service: light.turn_on
+  - data:
+      entity_id: light.h01
+    service: light.turn_off
+- id: '1537356732913'
+  alias: Autolight on when lock trigger
+  trigger:
+  - entity_id: lock.ytterdr
+    from: locked
+    platform: state
+    to: unlocked
+  - entity_id: lock.ytterdr
+    from: unlocked
+    platform: state
+    to: locked
+  - entity_id: lock.maindoor
+    from: unknown
+    platform: state
+    to: unlocked
+  - entity_id: lock.maindoor
+    from: unknown
+    platform: state
+    to: locked
+  condition: []
+  action:
+  - data:
+      entity_id: light.h01
+    service: light.turn_on
+  - delay: 00:20:00
+  - data:
+      entity_id: light.h01
+    service: light.turn_off
+- id: '1537659646450'
+  alias: Automation Screens UP at sunset
+  trigger:
+  - event: sunset
+    platform: sun
+  condition: []
+  action:
+  - data:
+      entity_id: scene.alle_screen_opp
+    service: scene.turn_on
+- id: '1537725445468'
+  alias: Automation Screens DOWN at sunrise
+  trigger:
+  - event: sunrise
+    platform: sun
+  condition: []
+  action:
+  - data:
+      entity_id: scene.alle_screen_ned
+    service: scene.turn_on

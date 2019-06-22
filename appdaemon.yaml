@@ -1,0 +1,15 @@
+log:
+  logfile: STDOUT
+  errorfile: STDERR
+appdaemon:
+  threads: 10
+  disable_apps: 1
+  plugins:
+    HASS:
+      type: hass
+      ha_url: http://192.168.1.2:8123
+      ha_key: !secret API_PASSWORD
+hadashboard:
+  dash_url: http://192.168.1.2:5050
+  dash_dir: /home/hass/config/dashboards
+  dash_compile_on_start: 1

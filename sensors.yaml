@@ -1,0 +1,64 @@
+# Weather prediction
+  - platform: yr
+    name: Weather
+    forecast: 24
+    monitored_conditions:
+      - temperature
+      - symbol
+#      - precipitation
+      - windSpeed
+      - pressure
+      - windDirection
+      - humidity
+      - fog
+      - cloudiness
+      - lowClouds
+      - mediumClouds
+      - highClouds
+#      - dewpointTemperature
+
+#  - platform: tibber
+#    access_token: !secret TIBBER_API_KEY
+
+#  - platform: systemmonitor
+#    resources:
+#      - type: disk_use_percent
+#        arg: /
+#      - type: memory_free
+#      - type: network_in
+#      - type: network_out
+#      - type: processor_use
+
+
+  - platform: darksky
+    api_key: !secret DARKSKY_API_KEY
+    forecast:
+      - 1
+    monitored_conditions:
+      - summary
+      - icon
+      - nearest_storm_distance
+      - nearest_storm_bearing
+      - precip_type
+      - precip_intensity
+      - precip_probability
+      - temperature
+      - apparent_temperature
+      - dew_point
+      - wind_speed
+      - wind_bearing
+      - cloud_cover
+      - humidity
+      - pressure
+      - visibility
+      - ozone
+      - minutely_summary
+      - hourly_summary
+      - daily_summary
+      - temperature_max
+      - temperature_min
+      - apparent_temperature_max
+      - apparent_temperature_min
+      - precip_intensity_max
+
+

@@ -1,0 +1,137 @@
+script_altibox_tv_on:
+  alias: Script Altibox TV ON
+  sequence:
+  - data:
+      activity: Altibox TV
+      entity_id: remote.harmony
+    service: remote.turn_on
+  - data:
+      entity_id: scene.screen_stue_ned
+    service: scene.turn_on
+  - alias: ''
+    data: {}
+    service: script.script_kitchen_lights_off
+  - data:
+      brightness: 50
+      entity_id: light.k01
+    service: light.turn_on
+  - data:
+      brightness: 50
+      entity_id: light.s01
+    service: light.turn_on
+script_kitchen_lights_on:
+  alias: Script Kitchen Lights ON
+  sequence:
+  - data:
+      entity_id: light.k01
+    service: light.turn_on
+  - data:
+      entity_id: light.k02
+    service: light.turn_on
+  - data:
+      entity_id: light.k03
+    service: light.turn_on
+  - data:
+      entity_id: light.k04
+    service: light.turn_on
+script_kitchen_lights_off:
+  alias: Script Kitchen Lights Off
+  sequence:
+  - data:
+      entity_id: light.k01
+    service: light.turn_off
+  - data:
+      entity_id: light.k02
+    service: light.turn_off
+  - data:
+      entity_id: light.k03
+    service: light.turn_off
+  - data:
+      entity_id: light.k04
+    service: light.turn_off
+script_altibox_tv_off:
+  alias: Script Altibox TV OFF
+  sequence:
+  - data:
+      activity: Altibox TV
+      entity_id: remote.harmony
+    service: remote.turn_off
+  - data:
+      entity_id: light.s01
+    service: light.turn_off
+  - data:
+      entity_id: scene.screen_stue_opp
+    service: scene.turn_on
+script_tv_lights_on:
+  alias: Script TV Lights
+  sequence:
+  - data:
+      brightness: '50'
+      entity_id: light.s01
+    service: light.turn_on
+  - service: script.script_kitchen_lights_off
+script_test_light:
+  alias: TestLight
+  sequence:
+  - alias: ''
+    data:
+      brightness: '50'
+      entity_id: light.k01
+    service: light.turn_on
+script_apple_tv_on:
+  alias: Script Apple TV ON
+  sequence:
+  - data:
+      activity: Apple TV
+      entity_id: remote.harmony
+    service: remote.turn_on
+  - service: script.script_tv_lights_on
+  - data:
+      entity_id: scene.screen_stue_ned
+    service: scene.turn_on
+script_apple_tv_off:
+  alias: Script Apple TV OFF
+  sequence:
+  - data:
+      activity: Apple TV
+      entity_id: remote.harmony
+    service: remote.turn_off
+  - data:
+      entity_id: light.s01
+    service: light.turn_off
+  - data:
+      brightness: 50
+      entity_id: light.k01
+    service: light.turn_on
+script_dim_kitchen_lights:
+  alias: Script DIM kitchen lights
+  sequence:
+    service: light.turn_on
+    data_template:
+      entity_id: light.k01{% if is_state('light.k02', 'on') %}, light.k02 {% endif %}{% if is_state('light.k03', 'on') %}, light.k03 {% endif %}{% if is_state('light.k04', 'on') %}, light.k04 {% endif %}
+      transition: 10
+      brightness: 50
+script_kitchen_lights_max:
+  alias: Script kitchen lights max
+  sequence:
+    service: light.turn_on
+    data_template:
+      entity_id: light.k01{% if is_state('light.k02', 'on') %}, light.k02 {% endif %}{% if is_state('light.k03', 'on') %}, light.k03 {% endif %}{% if is_state('light.k04', 'on') %}, light.k04 {% endif %}
+      transition: 10
+      brightness: 254
+script_dim_all_lights:
+  alias: Script DIM all lights
+  sequence:
+    service: light.turn_on
+    data_template:
+      entity_id: light.k01{% if is_state('light.k02', 'on') %}, light.k02 {% endif %}{% if is_state('light.k03', 'on') %}, light.k03 {% endif %}{% if is_state('light.k04', 'on') %}, light.k04 {% endif %}{% if is_state('light.h01', 'on') %}, light.h01 {% endif %}{% if is_state('light.s01', 'on') %}, light.s01 {% endif %}{% if is_state('light.s02', 'on') %}, light.s02 {% endif %}{% if is_state('light.v01', 'on') %}, light.v01 {% endif %}
+      transition: 10
+      brightness: 50
+script_all_lights_max:
+  alias: Script all lights max
+  sequence:
+    service: light.turn_on
+    data_template:
+      entity_id: light.k01{% if is_state('light.k02', 'on') %}, light.k02 {% endif %}{% if is_state('light.k03', 'on') %}, light.k03 {% endif %}{% if is_state('light.k04', 'on') %}, light.k04 {% endif %}{% if is_state('light.h01', 'on') %}, light.h01 {% endif %}{% if is_state('light.s01', 'on') %}, light.s01 {% endif %}{% if is_state('light.s02', 'on') %}, light.s02 {% endif %}{% if is_state('light.v01', 'on') %}, light.v01 {% endif %}
+      transition: 10
+      brightness: 254

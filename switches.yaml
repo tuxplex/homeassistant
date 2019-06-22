@@ -1,0 +1,43 @@
+  platform: template
+  switches:
+    yale_lock:
+      friendly_name: 'Ytterdør'
+      value_template: "{{ is_state('lock.maindoor', 'locked') }}"
+      turn_on:
+        service: lock.lock
+        data:
+          entity_id: lock.maindoor
+          code: !secret verisure_lock_code
+      turn_off:
+        service: lock.unlock
+        data:
+          entity_id: lock.maindoor
+          code: !secret verisure_lock_code
+
+    verisure_arm_away:
+      friendly_name: 'Verisure Arm Away'
+      value_template: "{{ is_state('alarm_control_panel.bergheimveien_alarm', 'armed') }}"
+      turn_on:
+        service: alarm_control_panel.alarm_arm_away
+        data:
+          entity_id: alarm_control_panel.bergheimveien_alarm
+          code: !secret verisure_lock_code
+      turn_off:
+        service: alarm_control_panel.alarm_disarm
+        data:
+          entity_id: alarm_control_panel.bergheimveien_alarm
+          code: !secret verisure_lock_code
+
+    verisure_arm_home:
+      friendly_name: 'Verisure Arm Home'
+      value_template: "{{ is_state('alarm_control_panel.bergheimveien_alarm', 'armed_home') }}"
+      turn_on:
+        service: alarm_control_panel.alarm_arm_home
+        data:
+          entity_id: alarm_control_panel.bergheimveien_alarm
+          code: !secret verisure_lock_code
+      turn_off:
+        service: alarm_control_panel.alarm_disarm
+        data:
+          entity_id: alarm_control_panel.bergheimveien_alarm
+          code: !secret verisure_lock_code
