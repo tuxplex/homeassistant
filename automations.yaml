@@ -1,3 +1,15 @@
+- alias: automate_ifttt
+  trigger:
+  - platform: event
+    event_type: ifttt_webhook_received
+    event_data:
+      action: call_service
+  action:
+  - service_template: '{{ trigger.event.data.service }}'
+    data_template:
+      entity_id: '{{ trigger.event.data.entity_id }}'
+  id: 6a3b4ba4a6764632b27e87a2a834293b
+
 - id: '1537306406918'
   alias: Autolight Night Mode
   trigger:
@@ -21,6 +33,10 @@
   - data:
       entity_id: light.h01
     service: light.turn_off
+  - data:
+      entity_id: lock.lock
+    service: script.lock_door
+
 - id: '1537306406919'
   alias: Autolight Morning Mode
   trigger:
@@ -38,24 +54,19 @@
     - sun
   action:
   - data:
-      brightness: '40'
       entity_id: light.k01
     service: light.turn_on
   - data:
-      brightness: '40'
       entity_id: light.k02
     service: light.turn_on
-  - data:
-      brightness: '40'
-      entity_id: light.h01
-    service: light.turn_on
+
 - id: '1537306406920'
   alias: Autolight Day Mode
-  trigger:
-  - at: '10:15'
-    platform: time
+  trigger: []
   condition:
-  - condition: time
+  - after: '10:15'
+    before: '17:00'
+    condition: time
     weekday:
     - mon
     - tue
@@ -72,51 +83,165 @@
   - data:
       entity_id: light.h01
     service: light.turn_off
-- id: '1537356732913'
-  alias: Autolight on when lock trigger
+
+- id: automation_sunscreen_down
+# Lower screens if 130 < sun.sun.azimuth < 265 and the weather state is either clearsky, sunny, partlycloudy, fair and the wind speed is lower than 22km/h
+# Prerequisite is that the screens are open already - NOTE that screen_vinterhage is registered as an awning and closed/open is swapped...
+  alias: Sunscreen DOWN
   trigger:
-  - entity_id: lock.ytterdr
-    from: locked
-    platform: state
-    to: unlocked
-  - entity_id: lock.ytterdr
-    from: unlocked
-    platform: state
-    to: locked
-  - entity_id: lock.maindoor
-    from: unknown
-    platform: state
-    to: unlocked
-  - entity_id: lock.maindoor
-    from: unknown
-    platform: state
-    to: locked
-  condition: []
-  action:
-  - data:
-      entity_id: light.h01
-    service: light.turn_on
-  - delay: 00:20:00
-  - data:
-      entity_id: light.h01
-    service: light.turn_off
-- id: '1537659646450'
-  alias: Automation Screens UP at sunset
-  trigger:
-  - event: sunset
-    platform: sun
-  condition: []
-  action:
-  - data:
-      entity_id: scene.alle_screen_opp
-    service: scene.turn_on
-- id: '1537725445468'
-  alias: Automation Screens DOWN at sunrise
-  trigger:
-  - event: sunrise
-    platform: sun
-  condition: []
+  - platform: time_pattern
+    minutes: /15
+  condition:
+    condition: and
+    conditions:
+    - condition: template
+      value_template: "{{ ((state_attr('sun.sun', 'azimuth') | float > 80) and (state_attr('sun.sun', 'azimuth') | float < 265 )) and ((states('weather.home') == 'clearsky' ) or (states('weather.home') == 'sunny' ) or (states('weather.home') == 'fair' )) and (state_attr('weather.home', 'wind_speed') | float < 27 ) }}"
+    - condition: state
+      entity_id: sun.sun
+      state: above_horizon
+    - condition: state
+      entity_id: cover.screen_vinterhage
+      state: closed
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: cover.screen_stue_2
+      state: open
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: cover.screen_stue_1
+      state: open
+      for:
+        minutes: 30
+    - condition: sun
+      before: sunset
+      before_offset: -00:45:00
+    - condition: numeric_state
+      entity_id: sensor.met_wind_speed
+      below: 24
   action:
   - data:
       entity_id: scene.alle_screen_ned
     service: scene.turn_on
+  - service: notify.mobile_app_ithomas
+    data:
+      message: The screens are turned on
+
+- id: automation_sunscreen_up_wind_rain
+  alias: Sunscreen UP 
+  trigger:
+    platform: time_pattern
+    minutes: /20
+  condition:
+    condition: and
+    conditions:
+    - condition: state
+      entity_id: cover.screen_vinterhage
+      state: open
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: cover.screen_stue_2
+      state: closed
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: cover.screen_stue_1
+      state: closed
+      for:
+        minutes: 30
+    - condition: template
+      value_template: "{{ ((states('weather.home') != 'clearsky') or (states('weather.home') != 'sunny') or (states('weather.home') != 'fair')) and ((state_attr('weather.home', 'wind_speed') | float > 27) or ((state_attr('sun.sun', 'azimuth') | float < 50) or (state_attr('sun.sun', 'azimuth') | float > 300))) or states('sun.sun') == 'below_horizon' }}"
+  action:
+  - data:
+      entity_id: scene.alle_screen_opp
+    service: scene.turn_on
+  - service: notify.mobile_app_ithomas
+    data:
+      message: The screens was rolled up due to wind, sunset or clouds
+
+- id: GroundHeatingOn
+  alias: Ground Heating On
+  description: ''
+  trigger:
+  - platform: time_pattern
+    minutes: /30
+  condition:
+  - condition: template
+    value_template: "{{ (state_attr('weather.home', 'temperature') | float > -9.9 and state_attr('weather.home', 'temperature') | float < 3) and (is_state('light.varmekabel', 'off') or is_state('light.aquadren', 'off')) and (is_state('input_boolean.heater_override', 'on')) }}"
+  action:
+  - service: light.turn_on
+    data: {}
+    entity_id: light.aquadren
+  - service: light.turn_on
+    data: {}
+    entity_id: light.varmekabel
+  - service: notify.mobile_app_ithomas
+    data:
+      message: Ground heating turned on
+  mode: single
+   
+- id: GroundHeatingOff
+  alias: Ground Heating Off
+  description: ''
+  trigger:
+  - platform: time_pattern
+    minutes: /10
+  condition:
+  - condition: template
+    value_template: "{{ (state_attr('weather.home', 'temperature') | float > 3.1 or state_attr('weather.home', 'temperature') | float < -10 ) and (is_state('light.varmekabel', 'on') or is_state('light.aquadren', 'on')) or (is_state('input_boolean.heater_override', 'off'))}}"
+  action:
+  - service: light.turn_off
+    data: {}
+    entity_id: light.aquadren
+  - service: light.turn_off
+    data: {}
+    entity_id: light.varmekabel
+  - service: notify.mobile_app_ithomas
+    data:
+      message: > 
+        {% if is_state('input_boolean.heater_override', 'off') %}
+          Ground heating turned off BY OVERRIDE
+        {% else %}
+          Ground heating turned off
+        {% endif %}
+  mode: single
+
+- id: LockTheDoor
+  alias: Lock The Door
+  description: ''
+  trigger:
+  - platform: time_pattern
+    minutes: /10
+  condition:
+  - condition: template
+    value_template: "{{ is_state('lock.maindoor', 'unlocked') }}"
+  - condition: time
+    after: '23:55:00'
+    before: '06:00:00'
+  action:
+  - service: light.turn_off
+    data: {}
+    entity_id: light.h01
+  - service: switch.turn_on
+    entity_id: switch.yale_lock  
+  - service: notify.mobile_app_ithomas
+    data:
+      message: Door locked
+  mode: single
+
+- id: alertWindSpeed
+  alias: Alert Message on high windspeed
+  description: ''
+  trigger:
+  - platform: time_pattern
+    minutes: /59
+  condition:
+  - condition: template
+    value_template: "{{ state_attr('weather.home', 'wind_speed') | float > 25 }}"
+  action:
+  - service: notify.mobile_app_ithomas
+    data:
+      message: Wind speed above 22 km/h and is now {{ state_attr('weather.home', 'wind_speed') | float }} km/h
+  mode: single

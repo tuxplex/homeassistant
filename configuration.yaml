@@ -1,62 +1,84 @@
+#################################################################
+#                                                               #
+#           Home Assistant Main Configuration File              #
+#                                                               #
+#################################################################
+
 homeassistant:
-  # Name of the location where Home Assistant is running
-  name: Bergheimveien
-  # Location required to calculate the time the sun rises and sets
+  name: !secret NAME
   latitude: !secret HOME_LAT 
   longitude: !secret HOME_LONG
-  # Impacts weather/sunrise data (altitude above sea level in meters)
   elevation: 142
-  # metric for Metric, imperial for Imperial
   unit_system: metric
-  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   time_zone: Europe/Oslo
-  # Customization file
+
+#################################################################
+#                                                               #
+#                        Customizations                         #
+#                                                               #
+#################################################################
+
   customize: !include customize.yaml
 
   auth_providers:
   - type: trusted_networks
     trusted_networks:
       - 192.168.1.0/24
+      - 192.168.1.139
       - 127.0.0.1
+      - 192.168.1.2
+      - ::1
     allow_bypass_login: true
-  - type: homeassistant  
-#  - type: legacy_api_password
-#    api_password: !secret API_PASSWORD
-
+  - type: homeassistant
+  
 # Uncomment this if you are using SSL/TLS, running in Docker container, etc.
 #   base_url: example.duckdns.org:8123
 http:
-  api_password: !secret API_PASSWORD
+#  api_password: !secret API_PASSWORD
+#  trusted_networks:
+#    - 127.0.0.1
+#    - 192.168.1.0/24
+#    - 62.92.211.2
+#  ip_ban_enabled: true
+#  login_attempts_threshold: 5
 
 # Show links to resources in log and frontend
 #introduction:
 
 # Enables the frontend Floorplan config
-frontend:
-  extra_html_url:
-    - /local/custom_ui/state-card-floorplan.html
+##frontend:
+##  extra_html_url:
+##    - /local/custom_ui/state-card-floorplan.html
 
-panel_custom:
-  - name: floorplan
-    sidebar_title: Floorplan
-    sidebar_icon: mdi:home
-    url_path: floorplan
-    config: !include floorplan.yaml
+#lovelace:
+#  mode: yaml
+
+##panel_custom:
+##  - name: floorplan
+##    sidebar_title: Floorplan
+##    sidebar_icon: mdi:home
+##    url_path: floorplan
+##    config: !include floorplan.yaml
 
 binary_sensor:
   - platform: mqtt
     state_topic: dummy/floorplan/sensor
     name: Floorplan
 
-# Enables configuration UI
+
+#################################################################
+#                                                               #
+#                           Enables                             #
+#                                                               #
+#################################################################
+
 config:
 
-# Tahoma (Screens, Awning, Garage door, Motion Sensor)
 tahoma:
   username: !secret TAHOMA_USERNAME
   password: !secret TAHOMA_PASSWORD
+#  exclude: [TSKAlarmComponent, PodV2Component, SonosConnectAMPComponent, SonosSubComponent, SonosPlayBarComponent, SonosPlayOneComponent]
 
-# Verisure
 verisure:
   username: !secret VERISURE_USERNAME
   password: !secret VERISURE_PASSWORD
@@ -76,20 +98,75 @@ remote:
 ifttt:
   key: !secret IFTTT_KEY 
 
-#homekit:
-#  pincode: !secret HOMEKIT_PIN
+#ios:
+#  push:
+#      categories:
+#        - name: Screen_msg 
+#          identifier: 'screen'
+#          actions:
+#            - identifier: 'SCREEN'
+#              title: 'Screen'
+#
+
+#logger:
+#  default: info
+#  logs:
+#    pydeconz: debug
+#    homeassistant.components.deconz: debug
+#
+
+system_health:
+
+homekit:
+  pincode: !secret HOMEKIT_PIN
+  filter:
+    include_domains:
+      - alarm_control_panel
+      - light
+      - cover
+      - script
+      - automation
+      - lock
+  entity_config:
+    lock.maindoor:
+      code: !secret verisure_lock_code 
+
+mobile_app:
+
+notify:
+ - platform: ios
+   name: iOS
+   target: !secret iOS_PUSH_ID
+
+ffmpeg:
+  ffmpeg_bin: /usr/bin/ffmpeg
+
+camera:
+  - platform: mjpeg
+    name: The Camera
+#    still_image_url: http://192.168.1.199/image/jpeg.cgi
+    mjpeg_url: http://192.168.1.199/video1.mjpeg
+    username: !secret CAM_USERNAME
+    password: !secret CAM_PASSWORD
+    verify_ssl: false
+
+#vacuum:
+#  - platform: roomba
+#    host: 192.168.1.130
+#    username: !secret ROOMBA_USERNAME 
+#    password: !secret ROOMBA_PASSWORD
 
 # Checks for available updates
 # Note: This component will send some information about your system to
 # the developers to assist with development of Home Assistant.
 # For more information, please see:
 # https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
-# updater:
+updater:
   # Optional, allows Home Assistant developers to focus on popular components.
-  # include_used_components: true
+  include_used_components: true
 
 # Discover some devices automatically
-#discovery:
+discovery:
 
 # Allows you to issue voice commands from the frontend in enabled browsers
 #conversation:
@@ -120,7 +197,7 @@ recorder:
      - sensor.date
 
 # View all events in a logbook
-# logbook:
+logbook:
 
 # Enables a map showing the location of tracked devices
 #map
@@ -131,12 +208,32 @@ sun:
 # Text to speech
 tts:
   - platform: google_translate
-    service_name: google_say
+    base_url: http://tuxplex.com:8123
+    service_name: tts.google_say
 
 mqtt:
   broker: localhost
   username: mqtt
   password: !secret MQTT_PASSWORD
+  keepalive: 60
+
+input_boolean:
+  heater_override:
+    name: 'Heater override'
+    initial: on
+
+influxdb:
+  host: 127.0.0.1
+  port: 8086
+  database: homeassistant
+  username: homeassistant
+  password: !secret INFLUXDB_PASSWORD
+  include: 
+    entities:
+    - sensor.electricity_price_bergheimveien_19
+    - sensor.speedtest_download
+    - sensor.speedtest_upload
+    - sensor.speedtest_ping
 
 #device_tracker:
 #  - platform: icloud
@@ -147,19 +244,25 @@ mqtt:
 # Cloud
 #cloud:
 
-media_player:
-  - platform: spotify
-    client_id: !secret SPOTIFY_ID
-    client_secret: !secret SPOTIFY_SECRET
-    aliases:
-        abc123def456: 'Living Room'
-        9183abas000: 'Bed Room'
+#media_player:
+#  - platform: spotify
+#    client_id: !secret SPOTIFY_ID
+#    client_secret: !secret SPOTIFY_SECRET
+#    aliases:
+#        abc123def456: 'Living Room'
+#        9183abas000: 'Bed Room'
+
+####################################################
+#                                                  #
+#                    Includes                      #
+#                                                  #
+####################################################
 
 sensor: !include sensors.yaml
 group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
 switch: !include switches.yaml
-device_tracker: !include_dir_merge_list device_tracker
+#device_tracker: !include_dir_merge_list device_tracker
 
 

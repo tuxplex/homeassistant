@@ -36,15 +36,13 @@
              - light.k02
              - light.k03
              - light.k04
-             - light.od
+             - light.outside_dimmer
              - light.ol
              - light.s01
              - light.s02
              - light.v01
-             - light.ol
-             - light.od
              - group.light.kitchen
-             - group.light.outside
+             - group.light.wall_lights
              - group.light.tv
           states:
             - state: 'on'

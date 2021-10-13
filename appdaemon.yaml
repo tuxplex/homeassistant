@@ -1,15 +1,20 @@
 log:
-  logfile: STDOUT
+  logfile: /home/hass/config/appdaemon.log
   errorfile: STDERR
 appdaemon:
-  threads: 10
+#  threads: 10
   disable_apps: 1
+  production_mode: True
   plugins:
     HASS:
       type: hass
       ha_url: http://192.168.1.2:8123
-      ha_key: !secret API_PASSWORD
+#      ha_key: !secret API_PASSWORD
+      token: !secret LL_ACCESS_TOKEN
 hadashboard:
   dash_url: http://192.168.1.2:5050
   dash_dir: /home/hass/config/dashboards
   dash_compile_on_start: 1
+
+http:
+  transport: socketi

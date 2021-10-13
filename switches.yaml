@@ -1,4 +1,5 @@
   platform: template
+
   switches:
     yale_lock:
       friendly_name: 'Ytterdør'
@@ -41,3 +42,15 @@
         data:
           entity_id: alarm_control_panel.bergheimveien_alarm
           code: !secret verisure_lock_code
+
+    ground_heater_override:
+      friendly_name: 'Heater override'
+      value_template: "{{ is_state('input_boolean.heater_override', 'on') }}"
+      turn_on:
+        service: input_boolean.turn_on
+        data:
+          entity_id: input_boolean.heater_override
+      turn_off:
+        service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.heater_override

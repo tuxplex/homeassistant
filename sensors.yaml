@@ -1,21 +1,4 @@
-# Weather prediction
-  - platform: yr
-    name: Weather
-    forecast: 24
-    monitored_conditions:
-      - temperature
-      - symbol
-#      - precipitation
-      - windSpeed
-      - pressure
-      - windDirection
-      - humidity
-      - fog
-      - cloudiness
-      - lowClouds
-      - mediumClouds
-      - highClouds
-#      - dewpointTemperature
+  - platform: version
 
 #  - platform: tibber
 #    access_token: !secret TIBBER_API_KEY
@@ -30,35 +13,52 @@
 #      - type: processor_use
 
 
-  - platform: darksky
-    api_key: !secret DARKSKY_API_KEY
-    forecast:
-      - 1
-    monitored_conditions:
-      - summary
-      - icon
-      - nearest_storm_distance
-      - nearest_storm_bearing
-      - precip_type
-      - precip_intensity
-      - precip_probability
-      - temperature
-      - apparent_temperature
-      - dew_point
-      - wind_speed
-      - wind_bearing
-      - cloud_cover
-      - humidity
-      - pressure
-      - visibility
-      - ozone
-      - minutely_summary
-      - hourly_summary
-      - daily_summary
-      - temperature_max
-      - temperature_min
-      - apparent_temperature_max
-      - apparent_temperature_min
-      - precip_intensity_max
+#  - platform: darksky
+#    api_key: !secret DARKSKY_API_KEY
+#    forecast:
+#      - 1
+#    monitored_conditions:
+#      - summary
+#      - icon
+#      - nearest_storm_distance
+#      - nearest_storm_bearing
+#      - precip_type
+#      - precip_intensity
+#      - precip_probability
+#      - temperature
+#      - apparent_temperature
+#      - dew_point
+#      - wind_speed
+#      - wind_bearing
+#      - cloud_cover
+#      - humidity
+#      - pressure
+#      - visibility
+#      - ozone
+#      - minutely_summary
+#      - hourly_summary
+#      - daily_summary
+#      - precip_intensity_max
+#
+  - platform: template
+    sensors:
+       met_temperature:
+          friendly_name: "Outside Temperature"
+          unit_of_measurement: '°C'
+          value_template: "{{ state_attr('weather.home', 'temperature') }}"
+       met_wind_speed:
+          friendly_name: "Outside Wind Speed"
+          unit_of_measurement: 'km/h'
+          value_template: "{{ state_attr('weather.home', 'wind_speed') }}"
+          icon_template: mdi:weather-windy
 
-
+          #  - platform: systemmonitor
+          #    resources:
+          #      - type: disk_use_percent
+          #        arg: /home
+          #      - type: memory_free
+          #      - type: throughput_network_in
+          #        arg: enp0s25
+          #      - type: throughput_network_out
+          #        arg: enp0s25
+          #      - type: processor_use
