@@ -34,6 +34,7 @@ homeassistant:
 # Uncomment this if you are using SSL/TLS, running in Docker container, etc.
 #   base_url: example.duckdns.org:8123
 http:
+
 #  api_password: !secret API_PASSWORD
 #  trusted_networks:
 #    - 127.0.0.1
@@ -90,13 +91,14 @@ verisure:
   mouse: 0
   code_digits: 6
 
-remote:
-  - platform: harmony
-    name: Harmony
-    host: 192.168.1.65
+#remote:
+#  - platform: harmony
+#    name: Harmony
+#    host: 192.168.1.65
 
 ifttt:
   key: !secret IFTTT_KEY 
+
 
 #ios:
 #  push:

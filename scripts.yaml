@@ -77,35 +77,49 @@ altibox_tv_on:
 
 kitchen_lights_on:
   alias: Script Kitchen Lights ON
+  description: "Turn on kitchen lights"
   sequence:
-  - data:
-      entity_id: light.k01
-    service: light.turn_on
-  - data:
-      entity_id: light.k02
-    service: light.turn_on
-  - data:
-      entity_id: light.k03
-    service: light.turn_on
-  - data:
-      entity_id: light.k04
-    service: light.turn_on
+    - alias: Turn on kitchen light one
+      service: light.turn_on
+      data:
+        entity_id: light.k01
+        brightness_pct: 80
+    - alias: Turn on kitchen light two  
+      service: light.turn_on
+      data:
+        entity_id: light.k02
+        brightness_pct: 50
+    - alias: Turn on kitchen light three  
+      service: light.turn_on
+      data:
+        entity_id: light.k03
+        brightness_pct: 50
+    - alias: Turn on kitchen light four
+      service: light.turn_on
+      data:
+        entity_id: light.k04
+        brightness_pct: 50
 
 kitchen_lights_off:
-  alias: Script Kitchen Lights Off
+  alias: Script Kitchen Lights OFF
+  description: "Turn off kitchen lights"
   sequence:
-  - data:
-      entity_id: light.k01
-    service: light.turn_off
-  - data:
-      entity_id: light.k02
-    service: light.turn_off
-  - data:
-      entity_id: light.k03
-    service: light.turn_off
-  - data:
-      entity_id: light.k04
-    service: light.turn_off
+    - alias: Turn off kitchen light one
+      service: light.turn_off
+      data:
+        entity_id: light.k01
+    - alias: Turn off kitchen light two  
+      service: light.turn_off
+      data:
+        entity_id: light.k02
+    - alias: Turn off kitchen light three  
+      service: light.turn_off
+      data:
+        entity_id: light.k03
+    - alias: Turn off kitchen light four
+      service: light.turn_off
+      data:
+        entity_id: light.k04
 
 kitchen_lights_max:
   alias: Script Kitchen Lights MAX
@@ -152,16 +166,6 @@ altibox_tv_off:
   - data:
       entity_id: scene.screen_stue_opp
     service: scene.turn_on
-
-#script_tv_lights_on:
-#  alias: Script TV Lights
-#  sequence:
-#  - data:
-#      entity_id: light.s01
-#      service: script.light_bright_mode
-#      data:
-#        input_light: 'light.s01'
-#  - service: script.script_kitchen_lights_off
 
 apple_tv_on:
   alias: Script Apple TV ON
